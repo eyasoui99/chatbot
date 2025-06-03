@@ -80,28 +80,24 @@ def generate_natural_response(api_response, user_query, language):
         if language == "French":
             prompt = f"""
             Tu es un assistant virtuel utile. Un utilisateur a posé la question suivante en français: "{user_query}"
-            
             L'API a retourné la réponse suivante:
             {json.dumps(api_response, indent=2)}
-            
             Analyse cette réponse et fournis une réponse claire et concise en français qui répond directement à la question de l'utilisateur.
             Si l'API a retourné des données dans le champ "result", utilise ces informations pour formuler ta réponse.
             Si l'API a fourni une explication dans le champ "explanation", incorpore-la dans ta réponse.
+            Si la question est une salutation (par exemple : "bonjour", "salut", etc.), répondre "Bonjour, comment puis-je vous aider ?"
+            Si la question n’est pas liée aux influenceurs, aux ventes, aux clics, aux marques ou aux données produits, répondre : « Je suis désolé, je n’ai pas compris votre question. Pourriez-vous la reformuler, s’il vous plaît ? »
             Sois conversationnel et utile dans ton ton.
             """
         else:
             prompt = f"""
-            You are a helpful virtual assistant. A user asked the following question in English: "{user_query}"
-            
-            The API returned the following response:
-            {json.dumps(api_response, indent=2)}
-            
-            Analyze this response and provide a clear and concise answer in English that directly addresses the user's question.
-            If the API returned data in the "result" field, use this information to formulate your response.
-            If the API provided an explanation in the "explanation" field, incorporate it into your response.
-            Be conversational and helpful in your tone.
-            """
-        
+            You are a helpful virtual assistant designed to assist users with their inquiries. A user has asked the following question in English: "{user_query}". 
+            Your task is to understand the {user_query}:
+                - If the question is a greeting (e.g., 'hello', 'hi', etc.), respond with 'Hello, how can I help you?'. No need to include any other information.
+                - If the question is not related to influencers, sales, clicks, brands, or product data respond with: 'I'm sorry, I didn't understand your question. Could you please rephrase it?'.
+                - If the question relates to influencers, sales, clicks, brands, or product data, use the following API response to answer: {json.dumps(api_response, indent=2)}. Always show the result well structured and reformulate it — don’t add any questions. 
+                - Ensure your tone is conversational and helpful."""
+                    
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
@@ -141,7 +137,7 @@ def process_user_query(user_input):
 def main():
     """Main application function"""
     st.title("🤖 Bilingual Chatbot Agent")
-    st.markdown("*Ask me questions in French or English about influencer data*")
+    st.markdown("*Ask me questions in French or English.*")
     
     # Configure Gemini API
     if not st.session_state.api_configured:
@@ -152,7 +148,6 @@ def main():
     with st.sidebar:
         st.header("ℹ️ About")
         st.write("This chatbot can answer questions about influencer data in both French and English.")
-        st.write("It uses an external text2sql API and Gemini Flash 1.5 for natural language processing.")
         
         st.header("🌍 Supported Languages")
         st.write("• English")
