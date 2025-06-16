@@ -165,7 +165,7 @@ def classify_query(query):
         You are a classifier assistant. Your task is to:
         1. Understand the user's query: "{query}" (it may be in French).
         2. Translate it to English if needed.
-        3. Classify the **English version** of the query into **exactly one** of the following three labels:
+        3. Classify the **English version** of the query into **exactly one** of the following two labels:
 
         ---
 
@@ -185,21 +185,16 @@ def classify_query(query):
         - Any query about influencer accounts or campaign conditions not asking for specific data
         - General platform usage or guidance
 
-        3. **web** → Use this label for general web-based or external content not specific to influencer data or platform documentation. This includes:
-        - News, current events, or market trends
-        - Popular culture, general curiosity, or public info not tied to the platform
-        - Greetings or non-informational content
-
         **Important**:
-        - If the query is not clearly 'analyze' or 'web', and it relates to influencer data or analytics, **classify it as 'text2sql'**.
-        - Return only one of the following: `text2sql`, `analyze`, or `web`.
+        - If the query is not clearly 'analyze', and it relates to influencer data or analytics, **classify it as 'text2sql'**.
+        - Return only one of the following: `text2sql`, `analyze`.
         - Do not explain your reasoning or return anything else.
         """ 
         #print(f"Classification prompt: {prompt}")
         response = model.generate_content(prompt)
         label = response.text.strip().lower()
         #print(f"Classification result: {label}")
-        return label if label in {"text2sql", "analyze", "web"} else "text2sql"
+        return label if label in {"text2sql", "analyze"} else "text2sql"
     except Exception as e:
         #print(f"Gemini classification failed: {e}")
         return "text2sql"
@@ -222,18 +217,18 @@ def call_api(query, language, conversation_history, influencer_uid="la0NUVFtxnNn
     
     query_type = classify_query(actual_query)
 
-    if query_type == "web":
-        try:
-            model = genai.GenerativeModel("gemini-1.5-flash")
-            prompt = (
-                f"Tu es un assistant qui répond à des questions d'actualité en français. Réponds clairement à cette question sans poser de questions supplémentaires : {actual_query}"
-                if language == "French"
-                else f"You are a helpful assistant answering news/trend queries. Give a structured and concise answer without asking any follow-up questions: {actual_query}"
-            )
-            response = model.generate_content(prompt)
-            return {"success": True, "result": response.text, "query_type": query_type, "was_reformulated": is_contextual}
-        except Exception as e:
-            return {"success": False, "error": f"Gemini error: {str(e)}", "query_type": query_type}
+    # if query_type == "web":
+    #     try:
+    #         model = genai.GenerativeModel("gemini-1.5-flash")
+    #         prompt = (
+    #             f"Tu es un assistant qui répond à des questions d'actualité en français. Réponds clairement à cette question sans poser de questions supplémentaires : {actual_query}"
+    #             if language == "French"
+    #             else f"You are a helpful assistant answering news/trend queries. Give a structured and concise answer without asking any follow-up questions: {actual_query}"
+    #         )
+    #         response = model.generate_content(prompt)
+    #         return {"success": True, "result": response.text, "query_type": query_type, "was_reformulated": is_contextual}
+    #     except Exception as e:
+    #         return {"success": False, "error": f"Gemini error: {str(e)}", "query_type": query_type}
 
     # Prepare API call data
     url = (
