@@ -122,7 +122,7 @@ def reformulate_query_with_context(current_query, conversation_history, language
         history_text = ""
         for msg in recent_history:
             history_text += f"{msg['role'].title()}: {msg['content']}\n"
-        
+        language = detect_language(current_query)
         if language == "French":
             prompt = f"""
             Tu dois reformuler une question en utilisant le contexte de la conversation précédente.
