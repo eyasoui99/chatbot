@@ -14,7 +14,7 @@ async def ask_questions_on_chatbot(questions):
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=False)
         page = await browser.new_page()
-        await page.goto("https://chatbot-e2fd.onrender.com/")
+        await page.goto("https://chat.softwise.app/")
 
         for q in questions:
             print(f"\n=== Question: {q} ===")
