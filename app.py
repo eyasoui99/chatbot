@@ -232,9 +232,9 @@ def call_api(query, language, conversation_history, influencer_uid="la0NUVFtxnNn
 
     # Prepare API call data
     url = (
-        "https://text2sql-mffb.onrender.com/api/analyze"
+        "https://chat.softwise.app/api/analyze"
         if query_type == "analyze"
-        else "https://text2sql-mffb.onrender.com/api/query"
+        else "https://chat.softwise.app/api/query"
     )
     
     # Enhanced data structure with conversation context
